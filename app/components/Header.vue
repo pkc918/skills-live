@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SearchIcon, GithubIcon, SunIcon, MoonIcon } from 'lucide-vue-next'
+import { CircuitBoard, GithubIcon, SunIcon, MoonIcon } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { useDark, useToggle } from '@vueuse/core'
 
@@ -44,12 +44,12 @@ watch(() => route.query.q, (newQuery) => {
 <template>
   <header
     :class="[
-      'border-b',
+      'border-b min-h-[72px] flex items-center',
       sticky && 'sticky top-0 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 z-50'
     ]"
   >
-    <div class="container mx-auto px-4 py-4">
-      <div class="flex items-center gap-4">
+    <div class="container mx-auto px-4 py-4 w-full">
+      <div class="flex items-center gap-4 min-h-10">
         <NuxtLink to="/" class="flex items-center gap-2 text-2xl font-bold">
           <img src="/icon.png" alt="Skills Club" class="h-6 w-6" />
           <span class="text-muted-foreground">/</span>
@@ -62,7 +62,7 @@ watch(() => route.query.q, (newQuery) => {
           class="flex-1 max-w-2xl"
         >
           <div class="relative">
-            <SearchIcon class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <CircuitBoard class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               v-model="searchQuery"
               type="text"
