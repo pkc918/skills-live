@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { CircuitBoard, GithubIcon, SunIcon, MoonIcon } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
 import { useDark, useToggle } from '@vueuse/core'
 
 interface Props {
@@ -74,7 +75,6 @@ watch(() => route.query.q, (newQuery) => {
         </form>
 
         <nav class="flex items-center gap-3 ml-auto">
-          <div class="separator" />
           <a
             href="https://github.com/skills-club/skills-live"
             target="_blank"
@@ -84,10 +84,12 @@ watch(() => route.query.q, (newQuery) => {
           >
             <GithubIcon class="h-4 w-4" />
           </a>
-          <div class="separator" />
+          <div class="h-4">
+            <Separator orientation="vertical" />
+          </div>
           <button
             @click="handleToggleTheme"
-            class="relative flex h-8 w-8 items-center justify-center rounded-md border border-border bg-background hover:bg-accent transition-all hover:scale-105 active:scale-95"
+            class="relative flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
             aria-label="Toggle theme"
           >
             <SunIcon
