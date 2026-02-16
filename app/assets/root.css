@@ -116,6 +116,12 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-mono;
+  }
+}
+
+@layer utilities {
+  .separator {
+    @apply h-4 w-px bg-border;
   }
 }
