@@ -1,4 +1,4 @@
-import { createApiError } from "~~/server/utils/errors"
+import { createApiError } from '~~/server/utils/errors'
 
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
@@ -8,8 +8,8 @@ export default defineEventHandler(async (event) => {
 
   const sql = useDb()
   const rows = await sql`
-    SELECT * FROM ${REPOS_FULL_TABLE}
-    WHERE id = ${id}
+    SELECT * FROM ${sql.unsafe(REPOS_FULL_TABLE)}
+    WHERE id = ${Number(id)}
     LIMIT 1
   `
   const repo = rows[0]
