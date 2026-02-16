@@ -17,7 +17,28 @@ type Props =
   | { type: 'repo'; item: Repo; skill?: never }
   | { type: 'skill'; item: SkillRow; repo?: never }
 
-const props = defineProps<Props & { class?: string }>()
+const props = withDefaults(
+  defineProps<Props & { class?: string; link?: boolean }>(),
+  { link: true },
+)
+
+const LinkComponent = resolveComponent('NuxtLink')
+
+const detailTo = computed(() =>
+  props.type === 'repo'
+    ? `/repos/${props.item.id}`
+    : `/skills/${props.item.id}`,
+)
+
+const articleClass = computed(() =>
+  cn(
+    'rounded-lg border border-border bg-card text-card-foreground shadow-sm overflow-hidden transition-colors',
+    props.link && 'cursor-pointer hover:bg-accent/5',
+    props.class,
+  ),
+)
+
+const wrapperProps = computed(() => (props.link ? { to: detailTo.value } : {}))
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString)
@@ -39,14 +60,8 @@ function formatSize(bytes: number): string {
 </script>
 
 <template>
-  <article
-    :class="
-      cn(
-        'rounded-lg border border-border bg-card text-card-foreground shadow-sm overflow-hidden',
-        props.class,
-      )
-    "
-  >
+  <component :is="props.link ? LinkComponent : 'div'" v-bind="wrapperProps" class="block">
+    <article :class="articleClass">
     <!-- Repo 完整展示 -->
     <template v-if="type === 'repo'">
       <div class="p-5 space-y-4">
@@ -72,7 +87,7 @@ function formatSize(bytes: number): string {
           aria-label="Repo dates"
         >
           <span
-            class="inline-flex items-center gap-0.5 justify-self-center"
+            class="inline-flex items-center gap-0.5"
             role="listitem"
             :title="`创建时间：${formatDate(item.created_at)}`"
           >
@@ -169,5 +184,6 @@ function formatSize(bytes: number): string {
         </dl>
       </div>
     </template>
-  </article>
+    </article>
+  </component>
 </template>
