@@ -180,17 +180,9 @@ function formatSize(bytes: number): string {
 
 <template>
   <div
-    class="container mx-auto px-4 py-8 flex flex-col min-h-0 overflow-hidden shrink-0"
+    class="container mx-auto p-4 flex flex-col min-h-0 overflow-hidden shrink-0"
     style="height: calc(100vh - 5rem); max-height: calc(100vh - 5rem);"
   >
-    <NuxtLink
-      to="/search"
-      class="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 shrink-0"
-    >
-      <ArrowLeft class="size-4" aria-hidden />
-      Back to search
-    </NuxtLink>
-
     <div v-if="pending" class="flex justify-center py-20">
       <div class="text-muted-foreground">Loading...</div>
     </div>
@@ -209,8 +201,8 @@ function formatSize(bytes: number): string {
       <!-- Repo: 左侧 skills 文件夹树 -->
       <ResizablePanel
         v-if="isRepo"
-        :default-size="35"
-        :min-size="20"
+        :default-size="15"
+        :min-size="10"
         class="min-w-0 min-h-0 flex flex-col overflow-hidden"
       >
         <div class="shrink-0 border-b border-border bg-card px-4 py-3">
