@@ -38,7 +38,11 @@ const articleClass = computed(() =>
   ),
 )
 
-const wrapperProps = computed(() => (props.link ? { to: detailTo.value } : {}))
+const wrapperProps = computed(() =>
+  props.link
+    ? { to: detailTo.value, target: '_blank', rel: 'noopener noreferrer' }
+    : {},
+)
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString)
