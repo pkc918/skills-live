@@ -174,10 +174,10 @@ const { copy, copied } = useClipboard({ source: fileContent })
             <Tabs v-model="viewMode" class="flex min-h-0 flex-1 flex-col gap-0">
               <div class="shrink-0 border-b border-border bg-muted/30 px-4 py-2 flex items-center justify-between gap-3">
                 <TabsList class="h-7 w-fit rounded-md p-0.5 text-xs">
-                  <TabsTrigger value="preview" class="rounded-l-[5px] px-2.5 py-1 text-xs data-[state=active]:rounded-l-[5px]">
+                  <TabsTrigger value="preview" class="px-2.5 py-1 text-xs">
                     Preview
                   </TabsTrigger>
-                  <TabsTrigger value="code" class="rounded-r-[5px] px-2.5 py-1 text-xs data-[state=active]:rounded-r-[5px]">
+                  <TabsTrigger value="code" class="px-2.5 py-1 text-xs">
                     Code
                   </TabsTrigger>
                 </TabsList>
