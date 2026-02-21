@@ -19,8 +19,8 @@ export interface SkillsGetQuery {
   offset?: number
 }
 
-/** Skill 行（联表时可能带 repo_name） */
-export type SkillRow = Skill & { repo_name?: string }
+/** Skill 行（联表时可能带 repo_name、repo_slug） */
+export type SkillRow = Skill & { repo_name?: string; repo_slug?: string }
 
 /** GET /api/skills 响应 */
 export interface SkillsGetResponse {

@@ -1,6 +1,3 @@
-import type { SkillRow } from '~~/shared/types/skill'
-import { createApiError } from '~~/server/utils/errors'
-
 export default defineEventHandler(async (event): Promise<SkillRow> => {
   const id = getRouterParam(event, 'id')
   if (!id) {
@@ -11,7 +8,7 @@ export default defineEventHandler(async (event): Promise<SkillRow> => {
   const table = sql.unsafe(SKILLS_FULL_TABLE)
   const reposTable = sql.unsafe(REPOS_FULL_TABLE)
   const rows = await sql`
-    SELECT s.*, r.name AS repo_name
+    SELECT s.*, r.name AS repo_name, r.repo AS repo_slug
     FROM ${table} s
     LEFT JOIN ${reposTable} r ON r.id = s.repo_id
     WHERE s.id = ${Number(id)}

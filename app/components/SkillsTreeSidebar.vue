@@ -105,17 +105,14 @@ function selectPath(path: string | null) {
 </script>
 
 <template>
-  <div class="flex flex-1 min-h-0 min-w-0 flex-col overflow-hidden">
-    <div class="shrink-0 border-b border-border bg-card px-4 py-3">
-      <h2 class="font-semibold truncate" :title="repoName">
+  <div class="flex h-full w-full min-h-0 min-w-0 flex-col overflow-hidden">
+    <div class="w-full shrink-0 border-b border-border bg-card px-4 py-1.5">
+      <h2 class="w-full font-semibold truncate" :title="repoName">
         {{ repoName }}
       </h2>
-      <p class="text-xs text-muted-foreground font-mono truncate mt-0.5">
-        {{ repoSlug }}
-      </p>
     </div>
     <nav
-      class="min-h-0 flex-1 overflow-auto p-2 rounded-l-lg bg-card text-card-foreground"
+      class="w-full min-h-0 flex-1 overflow-auto p-2 rounded-l-lg bg-card text-card-foreground"
       aria-label="Skills tree"
     >
       <template v-if="flatTree.length">

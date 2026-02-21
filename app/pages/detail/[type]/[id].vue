@@ -22,36 +22,83 @@ const { data: item, pending, error } = await useFetch<Repo | SkillRow>(apiUrl, {
 const isRepo = computed(() => type.value === 'repo' && item.value)
 const isSkill = computed(() => type.value === 'skill' && item.value)
 
+/** 用于拉取目录、文件内容的 repo id（repo 入口用路由 id，skill 入口用 skill 的 repo_id） */
+const repoId = computed(() => {
+  if (!item.value) return ''
+  if (type.value === 'repo') return String((item.value as Repo).id)
+  return String((item.value as SkillRow).repo_id ?? '')
+})
+
 const repoSlug = computed(() => {
   if (!item.value) return ''
   if (type.value === 'repo') return (item.value as Repo).repo
+  return (item.value as SkillRow).repo_slug ?? ''
+})
+
+const repoName = computed(() => {
+  if (!item.value) return ''
+  if (type.value === 'repo') return (item.value as Repo).name
   return (item.value as SkillRow).repo_name ?? ''
 })
 
 const { data: skillsResponse } = await useAsyncData(
-  () => `skills-repo-${id.value}`,
+  () => `skills-repo-${type.value}-${repoId.value}`,
   () =>
-    type.value === 'repo' && id.value
-      ? $fetch<SkillsGetResponse>(`/api/skills?repo_id=${id.value}&limit=500`)
-      : Promise.resolve({ data: [], limit: 0, offset: 0 }),
-  { watch: [type, id] },
+    !repoId.value
+      ? Promise.resolve({ data: [], limit: 0, offset: 0 })
+      : $fetch<SkillsGetResponse>(`/api/skills?repo_id=${repoId.value}&limit=500`),
+  { watch: [type, repoId] },
 )
 const skills = computed(() => skillsResponse.value?.data ?? [])
 
+/** skill 入口时拉取完整 Repo，用于右侧仓库信息 */
+const { data: repoBySkill } = await useAsyncData(
+  () => (type.value === 'skill' && repoId.value ? `repo-${repoId.value}` : 'repo-none'),
+  () =>
+    type.value === 'skill' && repoId.value
+      ? $fetch<Repo>(`/api/repos/${repoId.value}`, { method: 'POST' })
+      : Promise.resolve(null),
+  { watch: [type, repoId] },
+)
+/** 右侧栏展示用：repo 入口用 item，skill 入口用拉取的 repo */
+const repoForSidebar = computed<Repo | null>(() => {
+  if (type.value === 'repo' && item.value) return item.value as Repo
+  if (type.value === 'skill' && repoBySkill.value) return repoBySkill.value
+  return null
+})
+
 const selectedPath = ref<string | null>(null)
+
+/** 默认选中：skill 入口展示对应文件，repo 入口展示第一个文件 */
+watch(
+  [type, item, skills],
+  () => {
+    if (type.value === 'skill' && item.value) {
+      selectedPath.value = (item.value as SkillRow).path ?? null
+      return
+    }
+    if (type.value === 'repo' && skills.value.length > 0) {
+      const paths = new Set(skills.value.map((s) => s.path))
+      const firstPath = skills.value[0]?.path ?? null
+      if (selectedPath.value === null || !paths.has(selectedPath.value))
+        selectedPath.value = firstPath
+    }
+  },
+  { immediate: true },
+)
 
 const { data: contentData, pending: contentPending } = await useAsyncData(
   () =>
-    selectedPath.value && type.value === 'repo' && id.value
-      ? `content-${id.value}-${selectedPath.value}`
+    selectedPath.value && repoId.value
+      ? `content-${repoId.value}-${selectedPath.value}`
       : 'content-none',
   async () => {
-    if (!selectedPath.value || type.value !== 'repo' || !id.value) {
+    if (!selectedPath.value || !repoId.value) {
       return { content: '', error: undefined }
     }
     try {
       return await $fetch<{ content?: string; error?: string }>(
-        `/api/repos/${id.value}/content?path=${encodeURIComponent(selectedPath.value)}`,
+        `/api/repos/${repoId.value}/content?path=${encodeURIComponent(selectedPath.value)}`,
       )
     } catch (e: unknown) {
       const err = e as { data?: { message?: string }; message?: string }
@@ -60,7 +107,7 @@ const { data: contentData, pending: contentPending } = await useAsyncData(
       return { content: '', error: message }
     }
   },
-  { watch: [selectedPath, type, id] },
+  { watch: [selectedPath, repoId] },
 )
 const fileContent = computed(() => contentData.value?.content ?? '')
 const contentError = computed(() => contentData.value?.error)
@@ -93,88 +140,32 @@ const contentError = computed(() => contentData.value?.error)
         direction="horizontal"
         class="flex-1 min-w-0 min-h-0"
       >
-        <!-- 左：Repo 为 skills 树，Skill 为详情卡片 -->
+        <!-- 左：上仓库名 + 下目录（repo 入口=该 repo 下所有 skill 文件，skill 入口=该 repo 下所有 skill 文件） -->
         <ResizablePanel
-          v-if="isRepo"
+          v-if="isRepo || isSkill"
           :default-size="18"
           :min-size="10"
-          class="min-w-0 min-h-0 flex flex-col overflow-hidden"
+          class="flex h-full min-h-0 min-w-0 flex-col overflow-hidden"
         >
           <SkillsTreeSidebar
-            :repo-name="(item as Repo).name"
-            :repo-slug="(item as Repo).repo"
+            v-if="repoName"
+            :repo-name="repoName"
+            :repo-slug="repoSlug"
             :skills="skills"
-            v-model:selected-path="selectedPath"
+            :selected-path="selectedPath"
+            @update:selected-path="selectedPath = $event"
           />
         </ResizablePanel>
 
-        <ResizablePanel
-          v-else
-          :default-size="50"
-          :min-size="25"
-          class="min-w-0 min-h-0 overflow-hidden"
-        >
-          <article
-            class="h-full min-h-0 overflow-auto rounded-l-lg bg-card text-card-foreground shadow-sm p-6"
-          >
-            <template v-if="isSkill">
-              <div class="space-y-5">
-                <div class="flex items-start justify-between gap-3">
-                  <div class="min-w-0 flex-1">
-                    <h1 class="text-2xl font-semibold truncate" :title="(item as SkillRow).name">
-                      {{ (item as SkillRow).name }}
-                    </h1>
-                    <p
-                      class="text-muted-foreground font-mono mt-1 flex items-center gap-1.5 min-w-0"
-                      :title="(item as SkillRow).path"
-                    >
-                      <FolderOpen class="size-4 shrink-0" aria-hidden />
-                      <span class="truncate">{{ (item as SkillRow).path }}</span>
-                    </p>
-                  </div>
-                  <span
-                    v-if="(item as SkillRow).is_skill_md"
-                    class="shrink-0 rounded-md bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary"
-                  >
-                    SKILL.md
-                  </span>
-                </div>
-                <div v-if="(item as SkillRow).description" class="text-muted-foreground">
-                  <p class="whitespace-pre-wrap">{{ (item as SkillRow).description }}</p>
-                </div>
-                <div class="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                  <span class="inline-flex items-center gap-1.5">
-                    <FileText class="size-4" aria-hidden />
-                    {{ formatSize((item as SkillRow).size) }}
-                  </span>
-                </div>
-                <dl class="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm text-muted-foreground border-t border-border pt-4">
-                  <div class="inline-flex items-center gap-1.5">
-                    <dt class="sr-only">Repo</dt>
-                    <dd>Repo: {{ (item as SkillRow).repo_name ?? '—' }}</dd>
-                  </div>
-                  <div class="inline-flex items-center gap-1.5">
-                    <dt class="sr-only">Created</dt>
-                    <dd class="inline-flex items-center gap-1.5">
-                      <Calendar class="size-4 shrink-0" aria-hidden />
-                      {{ formatDate((item as SkillRow).created_at) }}
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-            </template>
-          </article>
-        </ResizablePanel>
+        <ResizableHandle v-if="isRepo || isSkill" with-handle />
 
-        <ResizableHandle with-handle />
-
-        <!-- 中：主内容区（Repo 为路径+文件内容，Skill 为占位） -->
+        <!-- 中：主内容区（路径 + 文件内容，repo/skill 入口共用） -->
         <ResizablePanel
-          :default-size="isRepo ? 65 : 50"
+          :default-size="(isRepo || isSkill) ? 65 : 50"
           :min-size="25"
           class="min-w-0 min-h-0 flex flex-col overflow-hidden"
         >
-          <template v-if="isRepo">
+          <template v-if="isRepo || isSkill">
             <div class="shrink-0 border-b border-border bg-muted/30 px-4 py-2">
               <p class="font-mono text-sm text-muted-foreground truncate" :title="selectedPath ?? ''">
                 {{ selectedPath ?? 'Select a file' }}
@@ -210,7 +201,8 @@ const contentError = computed(() => contentData.value?.error)
         aria-label="Sidebar"
       >
         <div class="flex-1 min-h-0 overflow-auto p-4 text-sm text-muted-foreground">
-          <RepoInfo v-if="isRepo" :repo="(item as Repo)" />
+          <RepoInfo v-if="repoForSidebar" :repo="repoForSidebar" />
+          <p v-else-if="repoId" class="text-muted-foreground">Loading repo…</p>
         </div>
       </aside>
       </div>
