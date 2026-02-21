@@ -71,6 +71,31 @@ const tree = computed(() => buildTree(props.skills))
 
 const expandedFolders = ref<Set<string>>(new Set())
 
+function getFolderPathsToExpand(filePath: string): string[] {
+  const parts = filePath.split('/').filter(Boolean)
+  if (parts.length <= 1) return []
+  const folders: string[] = []
+  let prefix = ''
+  for (let i = 0; i < parts.length - 1; i++) {
+    prefix = prefix ? `${prefix}/${parts[i]}` : parts[i]!
+    folders.push(prefix)
+  }
+  return folders
+}
+
+watch(
+  () => props.selectedPath,
+  (path) => {
+    if (!path) return
+    const toExpand = getFolderPathsToExpand(path)
+    if (toExpand.length === 0) return
+    const next = new Set(expandedFolders.value)
+    toExpand.forEach((p) => next.add(p))
+    expandedFolders.value = next
+  },
+  { immediate: true },
+)
+
 function flattenTree(nodes: TreeNode[], depth: number, prefix: string): FlatNode[] {
   const result: FlatNode[] = []
   for (const node of nodes) {
