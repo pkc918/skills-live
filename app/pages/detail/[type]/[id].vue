@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import type { Repo } from '#shared/types/repos'
-import type { SkillRow } from '#shared/types/skill'
-import type { SkillsGetResponse } from '#shared/types/skill'
 import {
   Calendar,
   FileText,
@@ -157,24 +154,6 @@ const { data: contentData, pending: contentPending } = await useAsyncData(
 )
 const fileContent = computed(() => contentData.value?.content ?? '')
 const contentError = computed(() => contentData.value?.error)
-
-function formatDate(dateString: string): string {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-  if (diffDays === 0) return 'today'
-  if (diffDays === 1) return 'yesterday'
-  if (diffDays < 7) return `${diffDays} days ago`
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`
-  if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`
-  return `${Math.floor(diffDays / 365)} years ago`
-}
-
-function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  return `${(bytes / 1024).toFixed(1)} KB`
-}
 </script>
 
 <template>

@@ -29,7 +29,6 @@
 
 <script setup lang="ts">
 import { CircuitBoard } from 'lucide-vue-next'
-import { Input } from '@/components/ui/input'
 
 definePageMeta({
   layout: 'default',
