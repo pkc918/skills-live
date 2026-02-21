@@ -1,5 +1,3 @@
-import { ReposGetQuery, ReposGetResponse } from "~~/shared/types/repos"
-
 type ReposGetEvent = Parameters<Parameters<typeof defineEventHandler>[0]>[0]
 
 /** GET /api/repos — 查询仓库列表，q 仅对 name 模糊匹配；支持 limit、offset */

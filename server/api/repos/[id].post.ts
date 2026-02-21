@@ -1,5 +1,3 @@
-import { createApiError } from '~~/server/utils/errors'
-
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
   if (!id) {

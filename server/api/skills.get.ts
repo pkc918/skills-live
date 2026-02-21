@@ -1,5 +1,3 @@
-import type { SkillRow, SkillsGetQuery, SkillsGetResponse } from "~~/shared/types/skill"
-
 type SkillsGetEvent = Parameters<Parameters<typeof defineEventHandler>[0]>[0]
 
 /** GET /api/skills — 查询技能列表，q 对 name、description 模糊匹配；支持 repo_id、limit、offset；联表返回 repo_name */
