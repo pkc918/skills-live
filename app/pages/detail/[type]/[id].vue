@@ -45,7 +45,6 @@ const { data: item, pending, error } = await useFetch<Repo | SkillRow>(apiUrl, {
 const isRepo = computed(() => type.value === 'repo' && item.value)
 const isSkill = computed(() => type.value === 'skill' && item.value)
 
-/** Repo slug for install commands (e.g. antfu/skills) */
 const repoSlug = computed(() => {
   if (!item.value) return ''
   if (type.value === 'repo') return (item.value as Repo).repo
@@ -228,7 +227,7 @@ function formatSize(bytes: number): string {
             </p>
           </div>
           <nav
-            class="flex-1 min-h-0 overflow-auto p-2 rounded-l-lg border-r border-border bg-card text-card-foreground"
+            class="flex-1 min-h-0 overflow-auto p-2 rounded-l-lg bg-card text-card-foreground"
             aria-label="Skills tree"
           >
             <template v-if="flatTree.length">
@@ -278,7 +277,7 @@ function formatSize(bytes: number): string {
           class="min-w-0 min-h-0 overflow-hidden"
         >
           <article
-            class="h-full min-h-0 overflow-auto rounded-l-lg border-r border-border bg-card text-card-foreground shadow-sm p-6"
+            class="h-full min-h-0 overflow-auto rounded-l-lg bg-card text-card-foreground shadow-sm p-6"
           >
             <template v-if="isSkill">
               <div class="space-y-5">
