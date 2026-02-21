@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Repo } from '#shared/types/repos'
-import { Star, GitFork, Eye } from 'lucide-vue-next'
+import { formatCount } from '@/lib/utils'
+import { Star, GitFork, Eye, GitBranch } from 'lucide-vue-next'
 
 const props = defineProps<{
   repo: Repo
@@ -35,17 +36,22 @@ const descriptionSingleLine = computed(() =>
       <div class="inline-flex items-center gap-1.5">
         <Star class="size-4 shrink-0" aria-hidden />
         <dt class="sr-only">Stars</dt>
-        <dd>{{ repo.stars }}</dd>
+        <dd>{{ formatCount(repo.stars) }}</dd>
       </div>
       <div class="inline-flex items-center gap-1.5">
         <GitFork class="size-4 shrink-0" aria-hidden />
         <dt class="sr-only">Forks</dt>
-        <dd>{{ repo.forks }}</dd>
+        <dd>{{ formatCount(repo.forks) }}</dd>
       </div>
       <div class="inline-flex items-center gap-1.5">
         <Eye class="size-4 shrink-0" aria-hidden />
         <dt class="sr-only">Watchers</dt>
-        <dd>{{ repo.watchers }}</dd>
+        <dd>{{ formatCount(repo.watchers) }}</dd>
+      </div>
+      <div class="inline-flex items-center gap-1.5">
+        <GitBranch class="size-4 shrink-0" aria-hidden />
+        <dt class="sr-only">Default branch</dt>
+        <dd class="font-mono truncate max-w-24" :title="repo.default_branch">{{ repo.default_branch }}</dd>
       </div>
     </dl>
   </div>

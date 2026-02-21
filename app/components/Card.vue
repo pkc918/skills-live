@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { cn } from '@/lib/utils'
+import { cn, formatCount } from '@/lib/utils'
 import type { SkillRow } from '../../shared/types/skill'
 import {
   Calendar,
@@ -118,15 +118,15 @@ function formatSize(bytes: number): string {
         <div class="flex flex-wrap items-center gap-4 text-sm text-muted-foreground border-t border-border pt-3">
           <span class="inline-flex items-center gap-1">
             <Star class="size-4" aria-hidden />
-            {{ item.stars }}  
+            {{ formatCount(item.stars) }}
           </span>
           <span class="inline-flex items-center gap-1">
             <Eye class="size-4" aria-hidden />
-            {{ item.watchers }}
+            {{ formatCount(item.watchers) }}
           </span>
           <span class="inline-flex items-center gap-1">
             <GitFork class="size-4" aria-hidden />
-            {{ item.forks }}
+            {{ formatCount(item.forks) }}
           </span>
           <span class="inline-flex items-center gap-1">
             <GitBranch class="size-4" aria-hidden />
