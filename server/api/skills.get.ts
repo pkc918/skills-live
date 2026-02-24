@@ -5,7 +5,7 @@ export default defineEventHandler(async (event: SkillsGetEvent): Promise<SkillsG
   const query = getQuery(event) as SkillsGetQuery
   const repoId = query.repo_id != null ? Number(query.repo_id) : null
   const q = (query.q as string)?.trim()
-  const limit = Math.min(Number(query.limit) || 20, 100)
+  const limit = Number(query.limit) || 10000
   const offset = Number(query.offset) || 0
 
   const sql = useDb()

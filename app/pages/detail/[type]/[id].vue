@@ -61,11 +61,14 @@ const { data: skillsResponse } = await useAsyncData(
   () =>
     !repoId.value
       ? Promise.resolve({ data: [], limit: 0, offset: 0 })
-      : $fetch<SkillsGetResponse>(`/api/skills?repo_id=${repoId.value}&limit=500`),
+      : $fetch<SkillsGetResponse>(`/api/skills?repo_id=${repoId.value}`),
   { watch: [type, repoId] },
 )
-const skills = computed(() => skillsResponse.value?.data ?? [])
 
+const skills = computed(() => skillsResponse.value?.data ?? [])
+onMounted(() => {
+  console.log('skills', skillsResponse.value)
+})
 /** skill 入口时拉取完整 Repo，用于右侧仓库信息 */
 const { data: repoBySkill } = await useAsyncData(
   () => (type.value === 'skill' && repoId.value ? `repo-${repoId.value}` : 'repo-none'),
