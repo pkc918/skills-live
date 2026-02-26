@@ -79,10 +79,10 @@ const { data: searchData, pending, error } = useLazyAsyncData(
     if (!query.value) return { skills: [], repos: [] }
     const [reposRes, skillsRes] = await Promise.all([
       $fetch<{ data: Repo[] }>('/api/repos', {
-        query: { q: query.value, limit: 50 },
+        query: { q: query.value },
       }),
       $fetch<{ data: Skill[] }>('/api/skills', {
-        query: { q: query.value, limit: 50 },
+        query: { q: query.value },
       }),
     ])
     return {
