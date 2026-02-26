@@ -39,19 +39,29 @@
         </p>
       </section>
 
-      <!-- 右侧：Repos，一行一个 card，宽度加宽 -->
-      <section class="w-[400px] shrink-0">
-        <h2 class="text-sm font-medium text-muted-foreground mb-3">
+      <!-- 右侧：Repos，虚拟列表优化性能 -->
+      <section class="w-[400px] shrink-0 flex flex-col min-h-0">
+        <h2 class="text-sm font-medium text-muted-foreground mb-3 shrink-0">
           Repos
           <span v-if="repos.length" class="ml-1">({{ repos.length }})</span>
         </h2>
-        <div v-if="repos.length" class="flex flex-col gap-4">
-          <Card
-            v-for="repo in repos"
-            :key="`repo-${repo.id}`"
-            type="repo"
-            :item="repo"
-          />
+        <div v-if="repos.length" class="flex-1 min-h-0">
+          <VirtualListGrid
+            :items="repos"
+            :columns="1"
+            :row-height="260"
+            height="calc(100vh - 200px)"
+            class="w-full"
+          >
+            <template #default="{ row }">
+              <Card
+                v-for="repo in row"
+                :key="`repo-${repo.id}`"
+                type="repo"
+                :item="repo"
+              />
+            </template>
+          </VirtualListGrid>
         </div>
         <p v-else class="text-sm text-muted-foreground py-8">
           No repos found for "{{ query }}"
